@@ -8,18 +8,22 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  password      String? // uniquement pour email+mdp
-  emailVerified DateTime?
-  image         String?
+  id       String  @id @default(cuid())
+  email    String  @unique
+  password String?
+  name     String?
+  image    String?
+
+  emailVerified       Boolean   @default(false)
+  verificationCode    String?
+  verificationExpires DateTime?
 
   accounts Account[]
   sessions Session[]
 
   createdAt DateTime @default(now())
 }
+
 
 model Account {
   id                String  @id @default(cuid())
@@ -33,8 +37,8 @@ model Account {
   token_type        String?
   scope             String?
   id_token          String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -44,8 +48,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {

@@ -8,8 +8,9 @@ import bcrypt from "bcrypt"
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
 
+  session: { strategy: "jwt" }, // ✅ IMPORTANT
+
   providers: [
-    // Connexion avec email + mot de passe
     CredentialsProvider({
       name: "Email",
       credentials: {
@@ -32,19 +33,36 @@ export const authOptions: AuthOptions = {
       },
     }),
 
-    // Connexion via GitHub
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
   ],
 
-  session: { strategy: "database" },
-
   pages: { signIn: "/login" },
 
   callbacks: {
-    async redirect({ url, baseUrl }) {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.name = user.name
+        token.email = user.email
+        token.image = user.image
+      }
+      return token
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string
+        session.user.name = token.name as string
+        session.user.email = token.email as string
+        session.user.image = token.image as string
+      }
+      return session
+    },
+
+    async redirect({ baseUrl }) {
       return `${baseUrl}/dashboard`
     },
   },
@@ -54,4 +72,3 @@ export const authOptions: AuthOptions = {
 
 const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
-
