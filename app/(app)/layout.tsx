@@ -1,14 +1,19 @@
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/base/app-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppHeader } from "@/components/base/app-header";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
-        <AppSidebar />
+      <AppSidebar />
 
-        <main className="flex-1 p-6 bg-background">{children}</main>
-      </div>
+      <SidebarInset>
+        {/* 🔝 HEADER */}
+        <AppHeader />
+
+        {/* 📄 PAGE CONTENT */}
+        <main className="flex-1 p-6">{children}</main>
+      </SidebarInset>
     </SidebarProvider>
   );
 }

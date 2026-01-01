@@ -33,7 +33,6 @@ import {
 export function AppSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-
   const user = session?.user;
 
   return (
@@ -44,7 +43,9 @@ export function AppSidebar() {
           <div className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">
             K
           </div>
-          <span className="font-semibold text-sm">KajyTime</span>
+          <span className="truncate font-semibold text-sm group-data-[collapsible=icon]:hidden">
+            KajyTime
+          </span>
         </div>
       </SidebarHeader>
 
@@ -85,7 +86,7 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === "/settings"}
-                  tooltip="Settings"
+                  tooltip="Paramètres"
                 >
                   <Link href="/settings">
                     <Settings />
@@ -105,10 +106,13 @@ export function AppSidebar() {
             <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-sidebar-accent">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.image ?? ""} />
-                <AvatarFallback>{user?.name?.charAt(0) ?? "U"}</AvatarFallback>
+                <AvatarFallback>
+                  {user?.name?.charAt(0)?.toUpperCase() ?? "U"}
+                </AvatarFallback>
               </Avatar>
 
-              <div className="flex flex-col overflow-hidden">
+              {/* Texte masqué quand sidebar collapsed */}
+              <div className="flex flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
                 <span className="truncate text-sm font-medium">
                   {user?.name ?? "Utilisateur"}
                 </span>
