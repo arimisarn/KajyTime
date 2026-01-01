@@ -14,7 +14,7 @@ model User {
   name     String?
   image    String?
 
-  emailVerified       Boolean   @default(false)
+  emailVerified       DateTime?
   verificationCode    String?
   verificationExpires DateTime?
 
