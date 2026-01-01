@@ -13,6 +13,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Moon, Sun } from "lucide-react";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -73,6 +74,15 @@ export default function SettingsPage() {
                     }, 300);
                   }}
                 />
+                <Link
+                  href="/settings/api-key"
+                  className="rounded-lg border p-4 hover:bg-muted transition"
+                >
+                  <h3 className="font-medium">API Key</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Connecter KajyTime à VS Code
+                  </p>
+                </Link>
               </div>
             </CardContent>
           </Card>
