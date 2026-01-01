@@ -1,17 +1,21 @@
-import "./globals.css"
-import { Providers } from "./provider"
+import "./globals.css";
+import { Providers } from "./provider";
 
 export const metadata = {
   title: "KajyTime",
   description: "Dashboard",
-}
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }

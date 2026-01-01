@@ -8,7 +8,6 @@ export function AppHeader() {
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-background px-4">
-      {/* 🔘 BOUTON TOGGLE SIDEBAR */}
       <SidebarTrigger />
 
       <div className="flex flex-1 items-center justify-between">
