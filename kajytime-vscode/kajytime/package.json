@@ -9,7 +9,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
@@ -24,8 +26,8 @@
     },
     "commands": [
       {
-        "command": "kajytime.helloWorld",
-        "title": "Hello World"
+        "command": "kajytime.setApiKey",
+        "title": "KajyTime: Entrer l’API Key"
       }
     ]
   },
