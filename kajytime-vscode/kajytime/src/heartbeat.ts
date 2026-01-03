@@ -3,10 +3,14 @@ import fetch from "node-fetch";
 
 export async function sendHeartbeat(context: vscode.ExtensionContext) {
   const apiKey = context.globalState.get<string>("kajytimeApiKey");
-  if (!apiKey) return;
+  if (!apiKey) {
+    return;
+  }
 
   const editor = vscode.window.activeTextEditor;
-  if (!editor) return;
+  if (!editor) {
+    return;
+  }
 
   const payload = {
     file: editor.document.fileName,

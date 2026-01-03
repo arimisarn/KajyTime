@@ -51,7 +51,9 @@ async function askForApiKey(context: vscode.ExtensionContext) {
     password: true,
   });
 
-  if (!apiKey) return;
+  if (!apiKey) {
+    return;
+  }
 
   await context.globalState.update(API_KEY_STORAGE, apiKey);
 
