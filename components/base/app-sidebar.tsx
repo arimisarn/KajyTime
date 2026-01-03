@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { Home, Calendar, Settings, LogOut, User, Key } from "lucide-react";
+import { Home, Calendar, Settings, LogOut, User, Key, Gauge } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -56,6 +56,16 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/dashboard"}
+                  tooltip="API Key"
+                >
+                  <Link href="/dashboard">
+                    <Gauge />
+                    <span>Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === "/settings/api-key"}
