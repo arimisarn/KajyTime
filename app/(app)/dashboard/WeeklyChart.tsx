@@ -1,14 +1,12 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { useEffect, useState } from "react";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,36 +18,25 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-/* ================================
-   Utils
-================================ */
-
-const DAYS = [
-  "Dimanche",
+const WEEK_DAYS = [
   "Lundi",
   "Mardi",
   "Mercredi",
   "Jeudi",
   "Vendredi",
   "Samedi",
+  "Dimanche",
 ];
 
-function dayLabel(dateStr: string) {
-  return DAYS[new Date(dateStr).getDay()];
+function getDayName(date: string) {
+  const d = new Date(date).getDay();
+  return WEEK_DAYS[d === 0 ? 6 : d - 1];
 }
 
-/* ================================
-   Types
-================================ */
-
-type WeeklyData = {
+type DayStat = {
   day: string;
   hours: number;
 };
-
-/* ================================
-   Chart config (shadcn)
-================================ */
 
 const chartConfig = {
   hours: {
@@ -58,39 +45,43 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-/* ================================
-   Component
-================================ */
-
 export function WeeklyChart() {
-  const [data, setData] = useState<WeeklyData[]>([]);
-  const totalHours = data.reduce((a, b) => a + b.hours, 0);
+  const [data, setData] = useState<DayStat[]>([]);
 
   useEffect(() => {
     fetch("/api/stats/weekly")
       .then((res) => res.json())
       .then((stats) => {
-        const formatted = Object.entries(stats).map(([date, seconds]) => ({
-          day: dayLabel(date),
-          hours: Math.round(((seconds as number) / 3600) * 10) / 10,
-        }));
-        setData(formatted);
+        const base: Record<string, number> = {};
+        WEEK_DAYS.forEach((d) => (base[d] = 0));
+
+        Object.entries(stats).forEach(([date, seconds]) => {
+          const day = getDayName(date);
+          base[day] = Math.round(((seconds as number) / 3600) * 10) / 10;
+        });
+
+        setData(
+          WEEK_DAYS.map((day) => ({
+            day,
+            hours: base[day],
+          }))
+        );
       });
   }, []);
 
   return (
     <Card className="col-span-3">
-      <CardHeader>
-        <CardTitle>7 derniers jours</CardTitle>
-        <CardDescription>Temps de code quotidien</CardDescription>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base">Progression hebdomadaire</CardTitle>
+        <CardDescription className="text-xs">Lundi → Dimanche</CardDescription>
       </CardHeader>
 
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="h-[180px] w-full">
           <LineChart
             accessibilityLayer
             data={data}
-            margin={{ left: 12, right: 12 }}
+            margin={{ left: 8, right: 8 }}
           >
             <CartesianGrid vertical={false} />
 
@@ -98,14 +89,8 @@ export function WeeklyChart() {
               dataKey="day"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={6}
               tickFormatter={(v) => v.slice(0, 3)}
-            />
-
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(v) => `${v}h`}
             />
 
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
@@ -115,27 +100,12 @@ export function WeeklyChart() {
               type="natural"
               stroke="var(--color-hours)"
               strokeWidth={3}
-              dot={{
-                r: 5,
-                fill: "var(--color-hours)",
-              }}
-              activeDot={{
-                r: 7,
-              }}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
             />
           </LineChart>
         </ChartContainer>
       </CardContent>
-
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Total cette semaine : {totalHours.toFixed(1)}h{" "}
-          <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="text-muted-foreground leading-none">
-          Basé sur l’activité enregistrée par KajyTime
-        </div>
-      </CardFooter>
     </Card>
   );
 }
