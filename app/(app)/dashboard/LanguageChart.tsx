@@ -41,7 +41,7 @@ export function LanguageChart() {
   }, []);
 
   return (
-    <Card className="col-span-2">
+    <Card className="col-span-1 md:col-span-2">
       <CardHeader>
         <CardTitle>Langages aujourd’hui</CardTitle>
       </CardHeader>

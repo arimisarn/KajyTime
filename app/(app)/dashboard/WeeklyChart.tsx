@@ -70,7 +70,7 @@ export function WeeklyChart() {
   }, []);
 
   return (
-    <Card className="col-span-3">
+    <Card className="col-span-1 md:col-span-2 lg:col-span-4">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Progression hebdomadaire</CardTitle>
         <CardDescription className="text-xs">Lundi → Dimanche</CardDescription>

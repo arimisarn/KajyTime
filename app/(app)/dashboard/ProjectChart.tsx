@@ -20,7 +20,8 @@ export function ProjectChart() {
   }, []);
 
   return (
-    <Card>
+    <Card className="col-span-1 md:col-span-2 lg:col-span-4">
+    
       <CardHeader>
         <CardTitle>Projets aujourd’hui</CardTitle>
       </CardHeader>

@@ -26,7 +26,7 @@ export function TodayCard() {
   const isUp = diff >= 0;
 
   return (
-    <Card>
+    <Card className="col-span-1">
       <CardHeader>
         <CardTitle>Aujourd’hui</CardTitle>
       </CardHeader>
