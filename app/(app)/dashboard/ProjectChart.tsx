@@ -20,12 +20,12 @@ export function ProjectChart() {
   }, []);
 
   return (
-    <Card className="col-span-3">
+    <Card>
       <CardHeader>
         <CardTitle>Projets aujourd’hui</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={260}>
           <BarChart data={data}>
             <XAxis dataKey="project" />
             <Tooltip />
