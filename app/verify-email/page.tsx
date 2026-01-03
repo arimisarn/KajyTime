@@ -1,41 +1,41 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+export const dynamic = "force-dynamic";
+
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function VerifyEmailPage() {
-  const router = useRouter()
-  const params = useSearchParams()
-  const email = params.get("email") || ""
+  const router = useRouter();
+  const params = useSearchParams();
+  const email = params.get("email") || "";
 
-  const [code, setCode] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleVerify() {
-    setLoading(true)
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/verify-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message)
-        setLoading(false)
-        return
+        alert(data.message);
+        return;
       }
 
-      alert("Email vérifié ✅")
-      router.push("/login")
-
+      alert("Email vérifié ✅");
+      router.push("/login");
     } catch {
-      alert("Erreur réseau")
+      alert("Erreur réseau");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -57,5 +57,5 @@ export default function VerifyEmailPage() {
         {loading ? "Vérification..." : "Vérifier"}
       </button>
     </div>
-  )
+  );
 }
