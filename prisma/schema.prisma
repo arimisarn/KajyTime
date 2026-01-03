@@ -21,8 +21,9 @@ model User {
   accounts Account[]
   sessions Session[]
 
-  createdAt DateTime @default(now())
-  apiKeys   ApiKey[]
+  createdAt  DateTime    @default(now())
+  apiKeys    ApiKey[]
+  heartbeats Heartbeat[]
 }
 
 model Account {
@@ -66,4 +67,16 @@ model ApiKey {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime  @default(now())
   lastUsed  DateTime?
+}
+
+model Heartbeat {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  file     String
+  language String
+  time     DateTime
+
+  createdAt DateTime @default(now())
 }
