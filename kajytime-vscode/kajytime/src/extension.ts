@@ -32,11 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   // Heartbeat sur activité utilisateur (throttlé)
-  const disposable = vscode.workspace.onDidChangeTextDocument(() => {
+  const disposable = vscode.workspace.onDidChangeTextDocument((event) => {
     const now = Date.now();
     if (now - lastHeartbeat > HEARTBEAT_INTERVAL) {
       lastHeartbeat = now;
-      sendHeartbeat(context);
+      sendHeartbeat(context, event.document);
     }
   });
 

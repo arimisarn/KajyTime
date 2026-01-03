@@ -1,21 +1,23 @@
 import * as vscode from "vscode";
-import fetch from "node-fetch";
 
-export async function sendHeartbeat(context: vscode.ExtensionContext) {
+export async function sendHeartbeat(
+  context: vscode.ExtensionContext,
+  document: vscode.TextDocument
+) {
+  if (document.isUntitled) {
+    return;
+  }
+
   const apiKey = context.globalState.get<string>("kajytimeApiKey");
   if (!apiKey) {
     return;
   }
 
-  const editor = vscode.window.activeTextEditor;
-  if (!editor) {
-    return;
-  }
-
   const payload = {
-    file: editor.document.fileName,
-    language: editor.document.languageId,
+    file: document.fileName,
+    language: document.languageId,
     project: vscode.workspace.name,
+    timestamp: new Date().toISOString(),
   };
 
   try {
@@ -27,7 +29,7 @@ export async function sendHeartbeat(context: vscode.ExtensionContext) {
       },
       body: JSON.stringify(payload),
     });
-  } catch (e) {
-    console.error("KajyTime heartbeat error", e);
+  } catch (error) {
+    console.error("KajyTime heartbeat error", error);
   }
 }

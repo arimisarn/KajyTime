@@ -39,6 +39,14 @@ export default function VerifyEmailPage() {
     }
   }
 
+  if (!email) {
+    return (
+      <p className="text-center mt-20 text-red-500">
+        Email manquant dans l’URL
+      </p>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-sm mx-auto mt-20">
       <h1 className="text-xl font-bold">Vérifie ton email</h1>
