@@ -3,6 +3,9 @@ import { initStatusBar, updateStatusBar } from "./statusBar";
 import { sendHeartbeat } from "./heartbeat";
 
 const API_KEY_STORAGE = "kajytimeApiKey";
+const HEARTBEAT_INTERVAL = 30_000; // 30 secondes
+
+let lastHeartbeat = 0;
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("🚀 KajyTime activated");
@@ -10,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Status bar
   initStatusBar(context);
 
-  // Commande UNIQUE
+  // Commande pour définir l’API Key
   const setApiKeyCommand = vscode.commands.registerCommand(
     "kajytime.setApiKey",
     async () => {
@@ -20,13 +23,21 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(setApiKeyCommand);
 
-  // 🔥 Demande automatique si pas de clé
+  // Demande automatique si aucune clé n’est stockée
   const storedKey = context.globalState.get<string>(API_KEY_STORAGE);
   if (!storedKey) {
     askForApiKey(context);
+  } else {
+    updateStatusBar(context);
   }
-  const disposable = vscode.workspace.onDidChangeTextDocument((event) => {
-    sendHeartbeat(context, event.document);
+
+  // Heartbeat sur activité utilisateur (throttlé)
+  const disposable = vscode.workspace.onDidChangeTextDocument(() => {
+    const now = Date.now();
+    if (now - lastHeartbeat > HEARTBEAT_INTERVAL) {
+      lastHeartbeat = now;
+      sendHeartbeat(context);
+    }
   });
 
   context.subscriptions.push(disposable);
@@ -40,14 +51,14 @@ async function askForApiKey(context: vscode.ExtensionContext) {
     password: true,
   });
 
-  if (!apiKey) {
-    return;
-  }
+  if (!apiKey) return;
 
-  await context.globalState.update("kajytimeApiKey", apiKey);
-  vscode.window.showInformationMessage("API Key enregistrée");
+  await context.globalState.update(API_KEY_STORAGE, apiKey);
 
+  vscode.window.showInformationMessage("✅ API Key KajyTime enregistrée");
   updateStatusBar(context);
 }
 
-export function deactivate() {}
+export function deactivate() {
+  console.log("🛑 KajyTime désactivé");
+}

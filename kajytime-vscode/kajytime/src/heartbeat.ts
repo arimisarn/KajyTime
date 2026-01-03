@@ -1,31 +1,17 @@
 import * as vscode from "vscode";
+import fetch from "node-fetch";
 
-const HEARTBEAT_INTERVAL = 120; // secondes
-const lastHeartbeats = new Map<string, number>();
-
-export async function sendHeartbeat(
-  context: vscode.ExtensionContext,
-  document: vscode.TextDocument
-) {
+export async function sendHeartbeat(context: vscode.ExtensionContext) {
   const apiKey = context.globalState.get<string>("kajytimeApiKey");
   if (!apiKey) return;
 
-  const file = document.fileName;
-  const now = Math.floor(Date.now() / 1000);
-  const last = lastHeartbeats.get(file);
-
-  // 🛑 Anti-spam
-  if (last && now - last < HEARTBEAT_INTERVAL) {
-    return;
-  }
-
-  lastHeartbeats.set(file, now);
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) return;
 
   const payload = {
-    apiKey,
-    file,
-    language: document.languageId,
-    timestamp: now,
+    file: editor.document.fileName,
+    language: editor.document.languageId,
+    project: vscode.workspace.name,
   };
 
   try {
@@ -33,10 +19,11 @@ export async function sendHeartbeat(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
     });
-  } catch (err) {
-    console.error("KajyTime heartbeat error", err);
+  } catch (e) {
+    console.error("KajyTime heartbeat error", e);
   }
 }
