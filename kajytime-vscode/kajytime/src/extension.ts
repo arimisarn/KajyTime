@@ -4,8 +4,11 @@ import { sendHeartbeat } from "./heartbeat";
 
 const API_KEY_STORAGE = "kajytimeApiKey";
 const HEARTBEAT_INTERVAL = 30_000; // 30 secondes
+const IDLE_DELAY = 2 * 60 * 1000; // 2 minutes
 
 let lastHeartbeat = 0;
+let isIdle = false;
+let idleTimeout: NodeJS.Timeout | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("🚀 KajyTime activated");
@@ -13,17 +16,16 @@ export function activate(context: vscode.ExtensionContext) {
   // Status bar
   initStatusBar(context);
 
-  // Commande pour définir l’API Key
+  // Commande API Key
   const setApiKeyCommand = vscode.commands.registerCommand(
     "kajytime.setApiKey",
     async () => {
       await askForApiKey(context);
     }
   );
-
   context.subscriptions.push(setApiKeyCommand);
 
-  // Demande automatique si aucune clé n’est stockée
+  // Demande auto si clé absente
   const storedKey = context.globalState.get<string>(API_KEY_STORAGE);
   if (!storedKey) {
     askForApiKey(context);
@@ -31,16 +33,50 @@ export function activate(context: vscode.ExtensionContext) {
     updateStatusBar(context);
   }
 
-  // Heartbeat sur activité utilisateur (throttlé)
-  const disposable = vscode.workspace.onDidChangeTextDocument((event) => {
-    const now = Date.now();
-    if (now - lastHeartbeat > HEARTBEAT_INTERVAL) {
-      lastHeartbeat = now;
-      sendHeartbeat(context, event.document);
-    }
-  });
+  // Reset idle au démarrage
+  resetIdleTimer();
 
-  context.subscriptions.push(disposable);
+  // ✍️ Activité utilisateur (édition)
+  const textChangeDisposable = vscode.workspace.onDidChangeTextDocument(
+    (event) => {
+      resetIdleTimer();
+
+      if (isIdle) return;
+
+      const now = Date.now();
+      if (now - lastHeartbeat > HEARTBEAT_INTERVAL) {
+        lastHeartbeat = now;
+        sendHeartbeat(context, event.document);
+      }
+    }
+  );
+
+  // 🖥 Focus fenêtre VS Code
+  const windowFocusDisposable = vscode.window.onDidChangeWindowState(
+    (state) => {
+      if (!state.focused) {
+        isIdle = true;
+        console.log("⏸ KajyTime paused (window unfocused)");
+      } else {
+        resetIdleTimer();
+      }
+    }
+  );
+
+  context.subscriptions.push(textChangeDisposable, windowFocusDisposable);
+}
+
+function resetIdleTimer() {
+  isIdle = false;
+
+  if (idleTimeout) {
+    clearTimeout(idleTimeout);
+  }
+
+  idleTimeout = setTimeout(() => {
+    isIdle = true;
+    console.log("⏸ KajyTime idle");
+  }, IDLE_DELAY);
 }
 
 async function askForApiKey(context: vscode.ExtensionContext) {
@@ -51,16 +87,13 @@ async function askForApiKey(context: vscode.ExtensionContext) {
     password: true,
   });
 
-  if (!apiKey) {
-    return;
-  }
+  if (!apiKey) return;
 
   await context.globalState.update(API_KEY_STORAGE, apiKey);
-
-  vscode.window.showInformationMessage("✅ API Key KajyTime enregistrée");
+  vscode.window.showInformationMessage("API Key KajyTime enregistrée");
   updateStatusBar(context);
 }
 
 export function deactivate() {
-  console.log("🛑 KajyTime désactivé");
+  console.log("KajyTime désactivé");
 }

@@ -1,38 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PieChart, Pie, Cell, Legend } from "recharts";
+
 import {
-  PieChart,
-  Pie,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  Legend,
-} from "recharts";
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const COLORS = [
-  "#6366f1", // indigo
-  "#22c55e", // green
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#06b6d4", // cyan
-  "#a855f7", // purple
+  "#6366f1",
+  "#22c55e",
+  "#f59e0b",
+  "#ef4444",
+  "#06b6d4",
+  "#a855f7",
 ];
 
+type PieData = {
+  name: string; // langage
+  value: number; // minutes
+};
+
 export function LanguageChart() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<PieData[]>([]);
 
   useEffect(() => {
     fetch("/api/stats/languages")
       .then((res) => res.json())
       .then((stats) => {
-        const formatted = Object.entries(stats).map(
-          ([language, seconds]) => ({
-            name: language,
-            value: Math.round((seconds as number) / 60), // minutes
-          })
-        );
+        const formatted = Object.entries(stats).map(([language, seconds]) => ({
+          name: language,
+          value: Math.round((seconds as number) / 60),
+        }));
         setData(formatted);
       });
   }, []);
@@ -44,29 +47,29 @@ export function LanguageChart() {
       </CardHeader>
 
       <CardContent>
-        <ResponsiveContainer width="100%" height={260}>
+        <ChartContainer
+          config={{}}
+          className="mx-auto aspect-square max-h-[260px]"
+        >
           <PieChart>
+            <ChartTooltip content={<ChartTooltipContent />} />
+
             <Pie
               data={data}
               dataKey="value"
               nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={90}
-              label
+              innerRadius={55}
+              outerRadius={95}
+              paddingAngle={3}
             >
               {data.map((_, index) => (
-                <Cell
-                  key={index}
-                  fill={COLORS[index % COLORS.length]}
-                />
+                <Cell key={index} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
 
-            <Tooltip />
             <Legend />
           </PieChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </CardContent>
     </Card>
   );

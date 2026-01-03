@@ -59,7 +59,7 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === "/dashboard"}
-                  tooltip="API Key"
+                  tooltip="Dashboard"
                 >
                   <Link href="/dashboard">
                     <Gauge />
