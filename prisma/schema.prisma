@@ -70,12 +70,13 @@ model ApiKey {
 }
 
 model Heartbeat {
-  id       String   @id @default(cuid())
-  userId   String
-  file     String?
-  language String?
-  project  String?
-  time     DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  file      String
+  language  String
+  project   String
+  time      DateTime
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
