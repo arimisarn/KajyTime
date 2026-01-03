@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const WEEKLY_GOAL_HOURS = 20; // 🔥 modifiable
-
+const WEEKLY_GOAL_HOURS = 20; 
 export function WeeklyGoalCard() {
   const [seconds, setSeconds] = useState(0);
 
