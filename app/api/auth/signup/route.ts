@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     })
 
     // TODO : envoyer l'email ici
-    console.log("Code de vérification :", code)
+    // console.log("Code de vérification :", code)
 
     return NextResponse.json({
       message: "Compte créé. Vérifie ton email.",
